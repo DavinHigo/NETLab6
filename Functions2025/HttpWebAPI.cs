@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SchoolLibrary;
@@ -152,26 +153,30 @@ public class HttpWebAPI
     }
 
     [Function("GetStudentCountBySchool")]
-    public HttpResponseData GetStudentCountBySchool(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/students/count-by-school")] HttpRequestData req)
+    public async Task<IActionResult> GetStudentCountBySchool(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students/count-by-school")] HttpRequest req)
     {
-        _logger.LogInformation("C# HTTP GET trigger function processed a request to get student count by school.");
+        try
+        {
+            var studentCountBySchool = await _context.Students
+                .GroupBy(s => s.School)
+                .Select(g => new
+                {
+                    School = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(g => g.Count)
+                .ToListAsync();
 
-        var studentCountBySchool = _context.Students
-                                           .GroupBy(s => s.School)
-                                           .Select(g => new
-                                           {
-                                               School = g.Key,
-                                               Count = g.Count()
-                                           })
-                                           .OrderByDescending(g => g.Count)
-                                           .ToList();
-
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json");
-        response.WriteStringAsync(JsonConvert.SerializeObject(studentCountBySchool));
-
-        return response;
+            return new OkObjectResult(studentCountBySchool);
+        }
+        catch (Exception ex)
+        {
+            return new ObjectResult($"Internal Server Error: {ex.Message}")
+            {
+                StatusCode = 500
+            };
+        }
     }
 
 }
