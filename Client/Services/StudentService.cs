@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http.Json;
+using System.Text.Json;
 using SchoolLibrary;
 
 namespace Client.Services;
@@ -22,7 +23,22 @@ public class StudentService
     // Get student count by school
     public async Task<List<SchoolCount>?> GetStudentCountBySchoolAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<SchoolCount>>("/api/students/count-by-school");
+        try
+        {
+            var response = await _httpClient.GetAsync("/api/students/count-by-school");
+            response.EnsureSuccessStatusCode(); // Throws if status code is not 2xx
+            return await response.Content.ReadFromJsonAsync<List<SchoolCount>>();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"HTTP Request Error: {ex.Message}");
+            return null; // Handle the error gracefully
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"JSON Parsing Error: {ex.Message}");
+            return null; // Handle the error gracefully
+        }
     }
 
     // Model for school count
