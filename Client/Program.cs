@@ -16,11 +16,11 @@ namespace Client
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            // Configure HttpClient with the base address from appsettings.json
-            var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? throw new InvalidOperationException("ApiBaseUrl is not configured.");
+            // Add HttpClient with base address from configuration
+            var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
             builder.Services.AddScoped(sp => new HttpClient
             {
-                BaseAddress = new Uri(apiBaseUrl)
+                BaseAddress = new Uri(apiBaseUrl ?? builder.HostEnvironment.BaseAddress)
             });
 
             builder.Services.AddScoped<StudentService>();
