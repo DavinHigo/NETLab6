@@ -136,7 +136,7 @@ public class HttpWebAPI
 
     [Function("GetStudentsBySchool")]
     public HttpResponseData GetStudentsBySchool(
-    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/students/school/{school}")] HttpRequestData req,
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students/school/{school}")] HttpRequestData req,
     string school)
     {
         _logger.LogInformation("C# HTTP GET trigger function processed a request to get students by school.");
