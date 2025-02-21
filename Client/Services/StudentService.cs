@@ -16,13 +16,13 @@ public class StudentService
     // Get students by school
     public async Task<List<Student>?> GetStudentsBySchoolAsync(string school)
     {
-        return await _httpClient.GetFromJsonAsync<List<Student>>($"/api/students/school/{school}");
+        return await _httpClient.GetFromJsonAsync<List<Student>>($"/api/api/students/school/{school}");
     }
 
     // Get student count by school
     public async Task<List<SchoolCount>?> GetStudentCountBySchoolAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<SchoolCount>>("/api/students/count-by-school");
+        return await _httpClient.GetFromJsonAsync<List<SchoolCount>>("/api/api/students/count-by-school");
     }
 
     // Model for school count
