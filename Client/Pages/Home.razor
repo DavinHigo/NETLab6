@@ -1,0 +1,72 @@
+﻿@page "/"
+@using Client.Services
+@using SchoolLibrary
+@using static Client.Services.StudentService
+@inject StudentService StudentService
+
+<h3>Students by School</h3>
+
+<input type="text" @bind="school" placeholder="Enter school name" />
+<button @onclick="GetStudents">Search</button>
+
+@if (students != null)
+{
+    <h4>Students in @school</h4>
+    <ul>
+        @foreach (var student in students)
+        {
+            <li>@student.FirstName @student.LastName</li>
+        }
+    </ul>
+}
+
+<h3>Student Count by School</h3>
+
+@if (schoolCounts != null)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>School</th>
+                <th>Number of Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var count in schoolCounts)
+            {
+                <tr>
+                    <td>@count.School</td>
+                    <td>@count.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string school = string.Empty; // Initialize with empty string
+    private List<Student> students = new(); // Initialize with empty list
+    private List<SchoolCount> schoolCounts = new(); // Initialize with empty list
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load student counts when the page loads
+        var counts = await StudentService.GetStudentCountBySchoolAsync();
+        if (counts != null)
+        {
+            schoolCounts = counts;
+        }
+    }
+
+    private async Task GetStudents()
+    {
+        if (!string.IsNullOrEmpty(school))
+        {
+            var result = await StudentService.GetStudentsBySchoolAsync(school);
+            if (result != null)
+            {
+                students = result;
+            }
+        }
+    }
+}
