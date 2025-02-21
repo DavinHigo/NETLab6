@@ -26,18 +26,18 @@ public class StudentService
         try
         {
             var response = await _httpClient.GetAsync("/api/students/count-by-school");
-            response.EnsureSuccessStatusCode(); // Throws if status code is not 2xx
+            response.EnsureSuccessStatusCode(); 
             return await response.Content.ReadFromJsonAsync<List<SchoolCount>>();
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine($"HTTP Request Error: {ex.Message}");
-            return null; // Handle the error gracefully
+            return null; 
         }
         catch (JsonException ex)
         {
             Console.WriteLine($"JSON Parsing Error: {ex.Message}");
-            return null; // Handle the error gracefully
+            return null; 
         }
     }
 
